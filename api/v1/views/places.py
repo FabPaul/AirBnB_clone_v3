@@ -133,7 +133,9 @@ def places_search():
             filtered_places.append(place)
 
     # Filter places based on amenities
-    filtered_places = [place for place in filtered_places if filter_by_amenities(place)]
+    filtered_places = [
+        place for place in filtered_places if filter_by_amenities(place)
+        ]
 
     # Return the filtered places as JSON response
     result = [place.to_json() for place in filtered_places]
