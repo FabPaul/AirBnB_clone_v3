@@ -53,14 +53,19 @@ def create_place(city_id):
         abort(400, 'Missing user_id')
     if 'name' not in request.get_json():
         abort(400, 'Missing name')
+
+    # create a dictionary from the JSON data
+    new_place_data = request.get_json()
     all_cities = storage.all("City").values()
     city_obj = [obj.to_dict() for obj in all_cities
                 if obj.id == city_id]
     if city_obj == []:
         abort(404)
     places = []
-    new_place = Place(name=request.json['name'],
-                      user_id=request.json['user_id'], city_id=city_id)
+
+    # use the data to create a new place object
+    new_place = Place(name=new_place_data['name'],
+                      user_id=new_place_data['user_id'], city_id=city_id)
     all_users = storage.all("User").values()
     user_obj = [obj.to_dict() for obj in all_users
                 if obj.id == new_place.user_id]
@@ -111,14 +116,16 @@ def search_places():
     if not states and not cities and not amenities:
         places = storage.all("Place").values()
     else:
-        for state_id in states:
-            state = storage.get("State", state_id)
-            if state:
-                places.extend(state.places)
-        for city_id in cities:
-            city = storage.get("City", city_id)
-            if city:
-                places.extend(city.places)
+        if state:
+            for state_id in states:
+                state = storage.get("State", state_id)
+                if state:
+                    places.extend(state.places)
+        if cities:
+            for city_id in cities:
+                city = storage.get("City", city_id)
+                if city:
+                    places.extend(city.places)
 
         if amenities:
             places = [place for place in places if all(
